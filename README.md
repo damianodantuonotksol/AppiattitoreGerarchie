@@ -28,4 +28,5 @@ Selezionare:
 Cliccare su **Genera Query**.
 Copiare la query cliccando su **Copia negli Appunti**.
 
-## Errori
+## Segnalazioni
+Per segnalare un bug è possibile usare la sezione [*issues*](https://github.com/damianodantuonotksol/AppiattitoreGerarchie/issues).
