@@ -180,8 +180,7 @@ namespace WpfApp1
 
         private void extractPreview()
         {
-            DataTable extraction = new DataTable();
-            extraction = DataLayer.DataProcess.GeneratePreview(_connectionString, _result);
+            DataTable extraction = DataLayer.DataProcess.GeneratePreview(_connectionString, _result);
             Preview.DataContext = extraction.DefaultView;
         }
 

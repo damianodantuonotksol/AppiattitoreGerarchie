@@ -55,6 +55,7 @@ namespace WpfApp1.DataLayer
             return dt;
         }
 
+        //funzione generica, non va bene per 4A. Non utilizzato
         internal static string GenerateQuery(string connectionString, string field, string description, string fatherfield, string fatherdescription, string table)
         {
             int counter = 1;
@@ -151,43 +152,44 @@ a0.{field} AS {field}_0, a0.{description} AS {description}_0
                 }
             }
             level--;
-
+            string coalesce = "COALESCE(";
+            for (int i = level; i >= 0; i--)
+            {
+                coalesce += $"d{i}.id,";
+            }
+            coalesce = coalesce.Trim(',');
+            coalesce += $") AS ID_{level}";
             select_query = @$"SELECT 
-a0.IDElement AS ID_0, d0.Codice AS COD_0, d0.Descrizione AS DES_0
+{coalesce}, d0.Codice AS COD_0, d0.Descrizione AS DES_0
 ";
-            
+
             from_query = $"FROM {table} as a0\nLEFT JOIN {des_table} d0 on a0.IDElement = d0.ID\n";
 
-            string coalesce_id;
             string coalesce_code;
             string coalesce_des;
-            string coalesce = "";
+            
             for (int i = 1; i <= level; i++)
             {
-                coalesce_id = "COALESCE(";
                 coalesce_code = "COALESCE(";
                 coalesce_des = "COALESCE(";
                 for (int j = i; j >= 0; j--)
                 {
-                    coalesce_id += $"a{j}.IDElement,";
                     coalesce_code += $"d{j}.Codice,";
                     coalesce_des += $"d{j}.Descrizione,";
                 }
 
-                coalesce_id = coalesce_id.TrimEnd(',');
                 coalesce_code = coalesce_code.TrimEnd(',');
                 coalesce_des = coalesce_des.TrimEnd(',');
 
-                coalesce_id += $") AS ID_{i}";
                 coalesce_code += $") AS COD_{i}";
                 coalesce_des += $") AS DES_{i}";
 
-                coalesce = coalesce_id + "," + coalesce_code + "," + coalesce_des;
+                coalesce = coalesce_code + "," + coalesce_des;
                 select_query += "," + coalesce + "\n";
-                from_query += $"LEFT JOIN {table} a{i} on a{i - 1}.IDParent = a{i}.IDElement\nLEFT JOIN {des_table} d{i} on d{i}.ID = a{i}.IDElement\n";
+                from_query += $"LEFT JOIN {table} a{i} on a{i-1}.IDElement=a{i}.IDParent\nLEFT JOIN {des_table} d{i} on d{i}.ID = a{i}.IDElement\n";
             }
 
-            query = select_query + from_query;
+            query = select_query + from_query + "WHERE (A0.IDParent=0)";
             return query;
         }
     }
